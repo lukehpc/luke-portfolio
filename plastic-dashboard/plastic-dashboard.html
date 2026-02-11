@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plastic Waste Dashboard | Luke Cairncross</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="plastic-dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="loaded">
+    <button id="theme-toggle" class="theme-btn">🌓</button>
+
+    <header>
+        <div class="header-content">
+            <img src="favicon.png" alt="Logo" class="header-logo">
+            <h1>Global Plastic Waste</h1>
+        </div>
+        <p>Visualising the scale of single-use plastic production and impact.</p>
+        <a href="../index.html" class="back-btn">← Back to Portfolio</a>
+    </header>
+
+    <main>
+        <div class="ticker-wrap">
+            <div class="ticker">
+                <span class="ticker-label">LIVE 2026 ESTIMATE (Tonnes): </span>
+                <span id="live-counter">0</span>
+                <span class="ticker-trend">▲ 1.2% rise since 2024</span>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <span>Total Waste (2026)</span>
+                <h3>430M Tonnes</h3>
+            </div>
+            <div class="stat-card">
+                <span>Top Contributor</span>
+                <h3>China</h3>
+            </div>
+            <div class="stat-card">
+                <span>Recycling Rate</span>
+                <h3>9%</h3>
+            </div>
+        </div>
+
+        <section id="insights" class="dashboard-section">
+            <div class="project-card">
+                <h2 class="anim-header">Dashboard Insights</h2>
+                <p>Plastic production has doubled in the last 20 years. This data visualises the exponential rise in waste and the global leaders in production as we approach sustainability targets.</p>
+            </div>
+        </section>
+
+        <section class="shopping-thoughts dashboard-section">
+            <div class="project-card">
+                <h2 class="anim-header">Mindful Shopping</h2>
+                <div class="thought-grid">
+                    <div class="thought-card">
+                        <div class="thought-inner">
+                            <div class="thought-front">Bottled Drinks</div>
+                            <div class="thought-back">"I'll buy this canned drink or carton instead of this plastic bottle of soda."</div>
+                        </div>
+                    </div>
+                    <div class="thought-card">
+                        <div class="thought-inner">
+                            <div class="thought-front">Packet Foods</div>
+                            <div class="thought-back">"I'll choose loose fruit instead of the plastic-wrapped multi-packs."</div>
+                        </div>
+                    </div>
+                    <div class="thought-card">
+                        <div class="thought-inner">
+                            <div class="thought-front">Plastic Bottles</div>
+                            <div class="thought-back">"I'll try a bar soap or shampoo bar to avoid another plastic bottle."</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="charts-grid" class="dashboard-section">
+            <div class="project-card chart-box">
+                <h2 class="anim-header">Global Waste Growth</h2>
+                <div class="canvas-wrapper"><canvas id="wasteChart"></canvas></div>
+            </div>
+            <div class="project-card chart-box">
+                <h2 class="anim-header">Top Contributors</h2>
+                <div class="canvas-wrapper"><canvas id="countryChart"></canvas></div>
+            </div>
+        </section>
+
+        <section class="news-section dashboard-section">
+            <div class="project-card news-card">
+                <h2 class="anim-header">Latest Reports</h2>
+                <div class="news-slider">
+                    <button id="prevNews" class="news-nav">❮</button>
+                    <div class="news-viewport"><div id="news-content"></div></div>
+                    <button id="nextNews" class="news-nav">❯</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="action-section dashboard-section">
+            <div class="project-card cta-card">
+                <h2 class="anim-header">Take Action</h2>
+                <p>Data is just the beginning. Use the tools below to measure your impact or support large-scale ocean restoration.</p>
+                <div class="cta-grid">
+                    <a href="https://www.earthday.org/plastic-pollution-calculator-2/" target="_blank" class="cta-btn calc-btn">Calculate Your Footprint</a>
+                    <a href="https://theoceancleanup.com/donate/" target="_blank" class="cta-btn ocean-btn">Support The Ocean Cleanup</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Data Source: OECD Global Plastics Outlook & UNEP 2026 Reports</p>
+    </footer>
+
+    <script src="plastic-dashboard.js"></script>
+</body>
+</html>

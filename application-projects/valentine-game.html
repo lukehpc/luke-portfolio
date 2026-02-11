@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dinks' Run | Valentine's Edition</title>
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; background: #0f172a; color: white; touch-action: none; }
+        
+        header { text-align: center; padding: 0.5rem; background: rgba(15, 23, 42, 0.8); }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 85vh;
+            position: relative;
+        }
+
+        #game-container {
+            position: relative;
+            width: 1000px;
+            height: 400px;
+            overflow: visible;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        canvas {
+            display: block;
+            background: #000;
+            border-radius: 8px;
+        }
+
+        .controls-hint {
+            margin-top: 15px;
+            color: #64748b;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .menu-btn {
+            color: white; border: none; padding: 12px; cursor: pointer; border-radius: 8px;
+            font-weight: bold; width: 100%; display: block; transition: all 0.2s;
+            text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;
+        }
+        
+        .menu-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .menu-btn:active { transform: translateY(0); }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 4px 0 #166534; }
+            50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4); }
+            100% { transform: scale(1); box-shadow: 0 4px 0 #166534; }
+        }
+        .btn-pulse { animation: pulse 2s infinite ease-in-out; }
+
+        .info-img { width: 25px; height: 25px; vertical-align: middle; margin-right: 10px; }
+        .avoid-img { height: 20px; width: auto; vertical-align: middle; margin-right: 10px; }
+
+        #shop-overlay {
+            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background-image: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.6)), url('images/clothes-rail.png'); 
+            background-size: cover; background-position: center; padding: 20px; border: 3px solid #a78bfa; 
+            border-radius: 20px; text-align: center; color: white; z-index: 160; 
+            box-shadow: 0 0 60px rgba(0,0,0,0.9); width: 750px; max-height: 80vh; 
+            overflow-y: auto; box-sizing: border-box;
+        }
+
+        /* Essential Mobile Scaling - Keeps desktop look but fits screen */
+        @media (max-width: 1000px) {
+            #game-container { width: 95vw; height: calc(95vw * 0.4); }
+            canvas { width: 100%; height: 100%; }
+            #shop-overlay { width: 95%; }
+        }
+    </style>
+</head>
+<body>
+    
+    <audio id="bgMusic" src="audio/lofi-bg.mp3" loop></audio>
+    <audio id="buySound" src="audio/buy.mp3"></audio>
+    <audio id="deathSound" src="audio/death.mp3"></audio>
+    <audio id="menuSound" src="audio/menu-switch.mp3"></audio>
+
+    <header>
+        <h1 style="margin: 0; color: #ff6b6b; font-size: 1.5rem;">Dinks' Run</h1>
+        <p style="margin: 2px 0; color: #94a3b8; font-size: 0.8rem;">Dedicated to Nina Rashbrook</p>
+        <a href="../index.html" style="color: #38bdf8; text-decoration: none; font-weight: bold; font-size: 0.9rem;">← Back to Portfolio</a>
+    </header>
+
+    <main>
+        <div id="game-container">
+            <div id="start-screen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85) url('images/project-logo.png') no-repeat center; background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 200; border-radius: 8px;">
+                <h1 style="color: #ff6b6b; font-size: 4rem; margin: 0; text-shadow: 4px 4px 0px #000; background: rgba(15, 23, 42, 0.5); padding: 10px 30px; border-radius: 20px;">Dinks' Run</h1>
+                <p style="color: #38bdf8; margin-bottom: 30px; font-size: 1.4rem; letter-spacing: 2px; text-shadow: 2px 2px 4px #000;">VALENTINE'S CARBOOT EDITION</p>
+                <button onclick="startGame()" class="btn-pulse" style="background: #22c55e; color: white; border: none; padding: 20px 60px; font-size: 1.8rem; cursor: pointer; border-radius: 15px; font-weight: bold;">START THRIFTING</button>
+            </div>
+
+            <div style="position: absolute; top: 20px; right: 20px; z-index: 300;">
+                <button onmouseover="showInfo()" onmouseout="hideInfo()" style="background: rgba(56, 189, 248, 0.2); border: 2px solid #38bdf8; border-radius: 50%; width: 40px; height: 40px; color: white; cursor: help; font-weight: bold; font-size: 1.2rem; backdrop-filter: blur(5px);">?</button>
+                <div id="info-popup" style="display: none; position: absolute; top: 50px; right: 0; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 20px; border-radius: 15px; color: white; width: 220px; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <p style="margin: 0 0 10px 0; font-weight: bold; color: #38bdf8; border-bottom: 1px solid #334155; padding-bottom: 5px;">Market Values</p>
+                    <div style="margin-bottom: 8px;"><img src="images/clothes.png" class="info-img"> Clothes: 5p</div>
+                    <div style="margin-bottom: 8px;"><img src="images/vinyls.png" class="info-img"> Vinyls: 10p</div>
+                    <div style="margin-bottom: 12px;"><img src="images/pins.png" class="info-img"> Pins: 20p</div>
+                    <p style="margin: 0 0 10px 0; font-weight: bold; color: #ff6b6b; border-bottom: 1px solid #334155; padding-bottom: 5px;">Avoid!</p>
+                    <div style="margin-bottom: 8px;"><img src="images/car.png" class="avoid-img"> Cars / Rails</div>
+                    <div style="margin-bottom: 8px;"><img src="images/pigeons.png" class="avoid-img"> Pigeons (Duck!)</div>
+                </div>
+            </div>
+
+            <canvas id="gameCanvas" width="1000" height="400"></canvas>
+            
+            <div id="game-ui-overlay" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                background-image: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.6)), url('images/car-back.png'); 
+                background-size: cover; background-position: center; padding: 40px; border: 3px solid #38bdf8; border-radius: 20px; 
+                text-align: center; color: white; z-index: 150; box-shadow: 0 0 60px rgba(0,0,0,0.9); width: 650px;">
+                
+                <h2 style="color: #ff6b6b; font-size: 2.8rem; margin: 0 0 20px 0; text-shadow: 3px 3px 6px #000;">Carboot Stall</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; gap: 20px;">
+                    <div style="background: rgba(15, 23, 42, 0.85); padding: 20px; border-radius: 15px; text-align: left; border: 1px solid #334155; flex: 1.2;">
+                        <p style="margin: 0 0 10px 0; font-weight: bold; color: #38bdf8; border-bottom: 1px solid #334155;">Latest Haul</p>
+                        <p>Clothes: <span id="run-clothes">0</span> (£<span id="val-clothes">0.00</span>)</p>
+                        <p>Vinyls: <span id="run-vinyls">0</span> (£<span id="val-vinyls">0.00</span>)</p>
+                        <p>Pins: <span id="run-pins">0</span> (£<span id="val-pins">0.00</span>)</p>
+                    </div>
+                    <div style="flex: 1;">
+                        <p style="font-size: 1rem; color: #94a3b8; margin: 0;">WALLET BALANCE</p>
+                        <p style="font-size: 3rem; margin: 0; color: #22c55e; font-weight: bold; text-shadow: 2px 2px 0px #000;">£<span id="total-coins">0.00</span></p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button onclick="sellItems()" class="menu-btn" style="background: #22c55e; box-shadow: 0 4px 0 #166534;">Sell All</button>
+                    <button onclick="openShop()" class="menu-btn" style="background: #a78bfa; box-shadow: 0 4px 0 #7c3aed;">Marketplace</button>
+                    <button onclick="playAgain()" class="menu-btn" style="background: #38bdf8; box-shadow: 0 4px 0 #0284c7;">Go Thrifting!</button>
+                </div>
+            </div>
+
+            <div id="shop-overlay">
+                <h2 style="color: #a78bfa; font-size: 2.5rem; margin: 0 0 5px 0; text-shadow: 3px 3px 6px #000;">Marketplace</h2>
+                <p style="font-size: 1.1rem; margin-bottom: 15px;">Available Funds: <span style="color: #22c55e; font-weight: bold;">£<span id="shop-coins">0.00</span></span></p>
+                <div id="skin-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; max-height: 250px; overflow-y: auto; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px;"></div>
+                <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    <button onclick="closeShop()" class="menu-btn" style="background: #38bdf8; width: 200px;">Back to Stall</button>
+                    <button onclick="toggleMute()" id="muteBtn" class="menu-btn" style="background: #475569; width: 150px;">Mute</button>
+                    <button onclick="resetProgress()" class="menu-btn" style="background: #ef4444; width: 100%; margin-top: 10px; font-size: 0.7rem; opacity: 0.8;">Reset Progress</button>
+                </div>
+            </div>
+        </div>
+        <div class="controls-hint">Space: Jump • Down Arrow: Duck • Mobile: Tap Top to Jump / Bottom to Duck</div>
+    </main>
+
+    <script src="valentine-game.js"></script>
+</body>
+</html>
