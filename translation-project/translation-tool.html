@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransFlow | CAT Tool Prototype</title>
+    <link rel="icon" type="image/png" href="favicon-transflow.png">
+    <link rel="stylesheet" href="translation-tool.css">
+</head>
+<body class="loaded">
+    <button id="theme-toggle" class="theme-btn">🌓</button>
+
+    <header>
+        <div class="header-content">
+            <div class="logo-wrapper">
+                <img src="favicon-transflow.png" alt="TransFlow Logo" class="header-logo">
+                <h1>TransFlow</h1>
+            </div>
+        </div>
+        <p>A minimalist Translation Memory tool with Fuzzy Match logic.</p>
+        <a href="../index.html" class="back-btn">← Back to Portfolio</a>
+    </header>
+
+    <main>
+        <section id="input-section" class="dashboard-section">
+            <div class="project-card" style="position: relative;">
+                <div class="help-tip">
+                    <span>?</span>
+                    <div class="help-content">
+                        <strong>Keyboard Shortcuts</strong>
+                        <ul>
+                            <li><strong>Ctrl + Enter:</strong> Save & Next</li>
+                            <li><strong>Ctrl + Insert:</strong> Copy Source</li>
+                            <li><strong>Alt + Up/Down:</strong> Navigate Segments</li>
+                            <li><strong>Ctrl + S:</strong> Manual Save</li>
+                            <li><strong>Ctrl + 1:</strong> Apply Top Match</li>
+                        </ul>
+                    </div>
+                </div>
+                <h2 class="anim-header">Source Text</h2>
+                <textarea id="source-input" placeholder="Paste your text here..."></textarea>
+                <button id="segment-btn" class="cta-btn ocean-btn" style="width: 100%;">Segment Text</button>
+            </div>
+        </section>
+
+        <div id="progress-container" class="discreet-progress" style="display: none;">
+            <div class="progress-meta">
+                <span>Project Progress</span>
+                <span id="progress-percent">0%</span>
+            </div>
+            <div class="progress-track">
+                <div id="progress-fill"></div>
+            </div>
+        </div>
+
+        <section id="workbench-section" class="dashboard-section" style="display: none;">
+            <div class="project-card">
+                <div class="workbench-header">
+                    <h2 class="anim-header">Workbench</h2>
+                    <span id="tm-status" class="ticker-trend">Memory Active: 0 Segments</span>
+                </div>
+                
+                <div id="segment-list"></div>
+
+                <div class="cta-grid">
+                    <button id="export-btn" class="cta-btn ocean-btn">Export Translation</button>
+                    <button id="clear-tm-btn" class="cta-btn calc-btn">Clear Memory</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="glossary-section" class="dashboard-section">
+            <div class="project-card">
+                <h2 class="anim-header">Term Base (Glossary)</h2>
+                <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 1rem;">Define "Must-Use" translations. Matching terms will highlight in the source.</p>
+                <div id="glossary-list"></div>
+                <div class="glossary-inputs" style="display: flex; gap: 10px; margin-top: 15px;">
+                    <input type="text" id="term-source" class="target-input" placeholder="Source Term" style="flex: 1;">
+                    <input type="text" id="term-target" class="target-input" placeholder="Translation" style="flex: 1;">
+                    <button id="add-term-btn" class="cta-btn ocean-btn" style="padding: 10px 20px;">Add</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <button id="scrollTop" aria-label="Scroll to top">↑</button>
+
+    <footer>
+        <p>Built by Luke Cairncross | Translation Workflow Concept 2026</p>
+    </footer>
+
+    <script src="translation-tool.js"></script>
+</body>
+</html>

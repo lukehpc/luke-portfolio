@@ -11,6 +11,53 @@ header { text-align: center; padding: 4rem 1rem; background: linear-gradient(135
 }
 .theme-btn:hover { background: #38bdf8; color: #020617; }
 
+/* SCROLL TO TOP BUTTON */
+.scroll-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 45px; /* Matched to main page size */
+    height: 45px;
+    background: #38bdf8; /* Solid color to match main page */
+    color: #020617;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 2000;
+    
+    /* Fade In/Out Logic */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.3s ease;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.scroll-btn.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-btn:hover {
+    transform: translateY(-5px);
+    background: #7dd3fc; /* Lighter blue on hover */
+}
+
+/* Light Theme Adjustments */
+body.light-theme .scroll-btn {
+    background: #0369a1;
+    color: #ffffff;
+}
+
+body.light-theme .scroll-btn:hover {
+    background: #0ea5e9;
+}
+
 /* LIGHT THEME OVERRIDES */
 body.light-theme { background-color: #f8fafc; color: #1e293b; }
 body.light-theme header { background: linear-gradient(135deg, #e2e8f0, #cbd5e1); }

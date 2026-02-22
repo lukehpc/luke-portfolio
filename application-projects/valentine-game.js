@@ -4,7 +4,7 @@ let unlockedSkins = JSON.parse(localStorage.getItem('unlockedSkins')) || ['class
 let activeColor = localStorage.getItem('activeColor') || '#ff6b6b';
 
 const shopSkins = [
-    { id: 'classic', name: 'Classic Red', hex: '#ff6b6b', price: 0 },
+    { id: 'classic', name: 'Classic Nina', hex: '#ff6b6b', price: 0 },
     { id: 'blue', name: 'Thrifter Blue', hex: '#38bdf8', price: 200 },
     { id: 'gold', name: 'Vintage Gold', hex: '#fbbf24', price: 500 },
     { id: 'rose', name: 'Velvet Rose', hex: '#f472b6', price: 750 },
@@ -18,7 +18,26 @@ const deathSound = document.getElementById('deathSound');
 const menuSound = document.getElementById('menuSound');
 let isMuted = false;
 
-// IMAGES
+// PLAYER SPRITES
+const ninaWalkFrames = [];
+['nina1b.png', 'nina1c.png', 'nina1d.png'].forEach(src => {
+    let img = new Image();
+    img.src = `images/${src}`;
+    ninaWalkFrames.push(img);
+});
+
+const imgNinaJump = new Image();
+imgNinaJump.src = 'images/ninajump.png';
+
+// PIGEON FRAMES
+const pigeonFrames = [];
+['pigeons.png', 'pigeons1.png', 'pigeons2.png', 'pigeons3.png'].forEach(src => {
+    let img = new Image();
+    img.src = `images/${src}`;
+    pigeonFrames.push(img);
+});
+
+// OTHER IMAGES
 const imgBackground = new Image(); imgBackground.src = 'images/background.png';
 const imgCloud = new Image(); imgCloud.src = 'images/clouds.png';
 const imgTable = new Image(); imgTable.src = 'images/tables.png';
@@ -27,7 +46,6 @@ const imgVehicles = new Image(); imgVehicles.src = 'images/vehicles.png';
 const imgTrees = new Image(); imgTrees.src = 'images/trees.png';
 const imgCar = new Image(); imgCar.src = 'images/car.png';
 const imgRail = new Image(); imgRail.src = 'images/rail.png';
-const imgPigeon = new Image(); imgPigeon.src = 'images/pigeons.png';
 const imgClothes = new Image(); imgClothes.src = 'images/clothes.png';
 const imgVinyl = new Image(); imgVinyl.src = 'images/vinyls.png';
 const imgPin = new Image(); imgPin.src = 'images/pins.png';
@@ -45,7 +63,6 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false; 
 
-// GAME ARRAYS
 let obstacles = [];
 let collectables = [];
 let bgDecor = []; 
@@ -70,7 +87,7 @@ let nextBgSpawn = 20;
 let clouds = [{ x: 100, y: 40, s: 0.2 }, { x: 600, y: 80, s: 0.3 }, { x: 1100, y: 50, s: 0.1 }];
 
 const player = {
-    x: 80, y: 350, width: 50, height: 50, 
+    x: 80, y: 350, width: 60, height: 80, // Adjusted size to fit human sprites better
     color: activeColor, dy: 0, jumpForce: 15,
     gravity: 0.7, grounded: false
 };
@@ -151,7 +168,6 @@ function animate() {
             const laneItems = bgDecor.filter(d => d.lane === lane);
             return laneItems.length > 0 ? laneItems[laneItems.length - 1] : null;
         };
-
         if (rand < 0.20) {
             const last = getLastInLane('trees');
             if (!last || last.x < canvas.width - (500 + Math.random() * 500)) {
@@ -205,14 +221,19 @@ function animate() {
     if (frameCount >= nextObstacleSpawn) {
         let rand = Math.random();
         let type, yPos, w, h, img;
-        if (rand < 0.25) { type = 'pigeon'; yPos = 220; w = 80; h = 60; img = imgPigeon; }
+        if (rand < 0.25) { type = 'pigeon'; yPos = 220; w = 80; h = 60; img = pigeonFrames[0]; }
         else { type = 'ground'; yPos = 300; w = 120; h = 100; img = rand < 0.6 ? imgCar : imgRail; }
         obstacles.push({ x: canvas.width, y: yPos, width: w, height: h, img: img, type: type });
         nextObstacleSpawn = frameCount + 80 + Math.floor(Math.random() * 50);
     }
     for (let i = 0; i < obstacles.length; i++) {
         let obs = obstacles[i]; obs.x -= gameSpeed;
-        ctx.drawImage(obs.img, Math.floor(obs.x), obs.y, obs.width, obs.height);
+        if (obs.type === 'pigeon') {
+            let pigeonFrameIdx = Math.floor(frameCount / 4) % 4;
+            ctx.drawImage(pigeonFrames[pigeonFrameIdx], Math.floor(obs.x), obs.y, obs.width, obs.height);
+        } else {
+            ctx.drawImage(obs.img, Math.floor(obs.x), obs.y, obs.width, obs.height);
+        }
         if (player.x < obs.x + obs.width - 30 && player.x + player.width > obs.x + 30 && player.y < obs.y + obs.height - 20 && player.y + player.height > obs.y + 20) {
             if (!(obs.type === 'pigeon' && isDucking)) { gameOver(); collectStreak = 0; }
         }
@@ -240,9 +261,16 @@ function animate() {
         }
     }
 
-    // --- 9. PHYSICS ---
-    if (isDucking && player.grounded) { player.height = 25; player.y = canvas.height - 25; } 
-    else { player.height = 50; player.dy += player.gravity; player.y += player.dy; }
+    // --- 9. PHYSICS & PLAYER ANIMATION ---
+    if (isDucking && player.grounded) { 
+        player.height = 40; 
+        player.y = canvas.height - 40; 
+    } else { 
+        player.height = 80; 
+        player.dy += player.gravity; 
+        player.y += player.dy; 
+    }
+    
     if (player.y + player.height >= canvas.height) { 
         player.y = canvas.height - player.height; player.dy = 0; 
         if (!player.grounded && !wasGroundedLastFrame) { createDust(player.x + player.width/2, canvas.height, 12, 1.8); }
@@ -250,8 +278,15 @@ function animate() {
     } else { player.grounded = false; }
     wasGroundedLastFrame = player.grounded;
 
-    ctx.fillStyle = player.color;
-    ctx.fillRect(Math.floor(player.x), Math.floor(player.y), player.width, player.height);
+    // RENDER NINA SPRITE
+    if (!player.grounded) {
+        ctx.drawImage(imgNinaJump, Math.floor(player.x), Math.floor(player.y), player.width, player.height);
+    } else {
+        // Walking logic (nina1b, c, d) - cycles every 6 frames
+        let walkIdx = Math.floor(frameCount / 6) % 3;
+        ctx.drawImage(ninaWalkFrames[walkIdx], Math.floor(player.x), Math.floor(player.y), player.width, player.height);
+    }
+
     ctx.fillStyle = 'white'; ctx.font = 'bold 20px Arial'; ctx.fillText(`Distance: ${score}m`, 20, 40);
     requestAnimationFrame(animate);
 }
@@ -321,14 +356,13 @@ function showInfo() { document.getElementById('info-popup').style.display = 'blo
 function hideInfo() { document.getElementById('info-popup').style.display = 'none'; }
 function toggleMute() { isMuted = !isMuted; bgMusic.muted = isMuted; document.getElementById('muteBtn').innerText = isMuted ? "Unmute" : "Mute"; }
 
-// KEYBOARD
+// INPUTS
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && player.grounded && gameActive) { player.dy = -player.jumpForce; player.grounded = false; }
     if (e.code === 'ArrowDown') isDucking = true;
 });
 window.addEventListener('keyup', (e) => { if (e.code === 'ArrowDown') isDucking = false; });
 
-// TOUCH
 window.addEventListener('touchstart', (e) => {
     if (!gameActive) return;
     const touchY = e.touches[0].clientY;
